@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>不适用UI的情况下使用QTCharts - 使用Qt Charts</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "\u4e0d\u9002\u7528UI\u7684\u60c5\u51b5\u4e0b\u4f7f\u7528QTCharts";
+    var mkdocs_page_input_path = "03.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> 使用Qt Charts</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Qt Charts</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">不适用UI的情况下使用QTCharts</a>
+    <ul class="subnav">
+            
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Axis/">坐标轴</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../02/">实时曲线</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">使用Qt Charts</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>不适用UI的情况下使用QTCharts</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <p>新建一个<strong>Qt Widgets Application</strong>项目，不添加UI文件，如下图：</p>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/02/creating.png?x-oss-process=style/add_shuiying" /></p>
+<p>建立工程后，在<strong>.pro</strong>文件中添加：</p>
+<pre><code>QT += charts
+</code></pre>
+
+<p>然后在<strong>.h</strong>文件中添加：</p>
+<pre><code>#include &quot;QChart&quot;
+
+using namespace QtCharts;
+</code></pre>
+
+<p>在<strong>.cpp</strong>中，先添加一些用到的头文件，把窗口最小值设置为500X500，添加一个QVBoxLayout，代码如下：</p>
+<pre><code>#include &quot;dialog.h&quot;
+#include &quot;QVBoxLayout&quot;
+#include &quot;QChart&quot;
+#include &quot;QChartView&quot;
+#include &quot;QSplineSeries&quot;
+
+Dialog::Dialog(QWidget *parent)
+    : QDialog(parent)
+{
+    setMinimumSize(500,500);
+    QVBoxLayout *container;
+    this-&gt;setLayout(container);
+}
+</code></pre>
+
+<p>然后声明变量：</p>
+<pre><code>    QChart *chart;
+    QChartView *ChartView;
+    QSplineSeries *series;
+</code></pre>
+
+<p>分别声明了一个QchartView、QChart、QSplineSeries对象。</p>
+<p>然后给series添加数值，这里添加5个点，</p>
+<pre><code>    series-&gt;append(0,1);
+    series-&gt;append(1,2);
+    series-&gt;append(2,3);
+    series-&gt;append(3,4);
+    series-&gt;append(4,5);
+</code></pre>
+
+<p>最后把series添加到QChart，把QChart添加到ChartView，再把ChartView添加到layout中，最后代码如下：</p>
+<pre><code>Dialog::Dialog(QWidget *parent)
+    : QDialog(parent)
+{
+    setMinimumSize(500,500);
+    QVBoxLayout *container;
+
+    QChart *chart;
+    QChartView *ChartView;
+    QSplineSeries *series;
+
+    series = new QSplineSeries(this);
+    chart = new QChart();
+
+    series-&gt;append(0,1);
+    series-&gt;append(1,2);
+    series-&gt;append(2,3);
+    series-&gt;append(3,4);
+    series-&gt;append(4,5);
+
+    chart-&gt;addSeries(series);
+    chart-&gt;createDefaultAxes();
+    ChartView = new QChartView(this);
+    ChartView-&gt;setChart(chart);
+
+    container = new QVBoxLayout();
+    container-&gt;addWidget(ChartView);
+
+    this-&gt;setLayout(container);
+}
+</code></pre>
+
+<p>编译运行结果如下：</p>
+<p>​   <img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/02/result.png?x-oss-process=style/add_shuiying" /></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../Axis/" class="btn btn-neutral float-right" title="坐标轴">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Qt Charts"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../Axis/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

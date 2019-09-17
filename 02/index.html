@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>实时曲线 - 使用Qt Charts</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "\u5b9e\u65f6\u66f2\u7ebf";
+    var mkdocs_page_input_path = "02.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> 使用Qt Charts</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Qt Charts</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../03/">不适用UI的情况下使用QTCharts</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../Axis/">坐标轴</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">实时曲线</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#1">1、添加坐标轴</a></li>
+    
+
+    <li class="toctree-l2"><a href="#2">2、使用定时器动态添加数据</a></li>
+    
+
+    <li class="toctree-l2"><a href="#3">3、实现实时曲线</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#1-seriesx">1. 一个方法是当序列series中的数据增加时，X轴范围也增加，代码如下：</a></li>
+        
+            <li><a class="toctree-l3" href="#2-x">2. 还是改变x轴的，不过，可现实区域是固定的</a></li>
+        
+            <li><a class="toctree-l3" href="#3-scroll">3. 使用scroll方法</a></li>
+        
+            <li><a class="toctree-l3" href="#4-serial">4. 更新全部serial</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">使用Qt Charts</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>实时曲线</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="1">1、添加坐标轴</h2>
+<p>按照之前的一篇笔记,先在工程中添加QChart、QChartView，代码如下：</p>
+<pre><code>Dialog::Dialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::Dialog)
+{
+    ui-&gt;setupUi(this);
+    chart = new QChart();
+    ChartView = new QChartView(this);
+    ChartView-&gt;setChart(chart);
+    ui-&gt;verticalLayout-&gt;addWidget(ChartView);
+}
+</code></pre>
+
+<p>然后定义两个坐标轴，一个用作X轴，一个用作Y轴，
+添加头文件：</p>
+<pre><code>#include &lt;QtCharts/QValueAxis&gt;
+</code></pre>
+
+<p>创建两个QValueAxis：</p>
+<pre><code>    QValueAxis *axisX;
+    QValueAxis *axisY;
+</code></pre>
+
+<p>在构造函数中，对两个坐标轴进行实例化，把X轴范围设置为0-10并放置在坐标系的底部，Y轴范围设置为0-10并放置在坐标系的左边，并且添加到QChart中，如下：</p>
+<pre><code>Dialog::Dialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::Dialog)
+{
+    ui-&gt;setupUi(this);
+    chart = new QChart();
+
+    axisX = new QValueAxis();
+    axisY = new QValueAxis();
+
+    chart-&gt;addAxis(axisX,Qt::AlignBottom);
+    chart-&gt;addAxis(axisY,Qt::AlignLeft);
+
+    axisX-&gt;setTickCount(5);
+    axisX-&gt;setRange(0, 10);
+    axisY-&gt;setRange(0, 10);
+
+    ChartView = new QChartView(this);
+    ChartView-&gt;setChart(chart);
+    ui-&gt;verticalLayout-&gt;addWidget(ChartView);
+}
+</code></pre>
+
+<p>编译运行，结果如下：</p>
+<p><img alt="" src="add_axis.png" /></p>
+<p>从上图可以看出，成功创建了一个笛卡尔坐标系。</p>
+<h2 id="2">2、使用定时器动态添加数据</h2>
+<p>这里尝试下使用曲线图，创建一个曲线序列，</p>
+<ul>
+<li>添加头文件</li>
+</ul>
+<pre><code>#include &lt;QtCharts/QSplineSeries&gt;
+</code></pre>
+
+<ul>
+<li>在类声明中添加：</li>
+</ul>
+<pre><code>QSplineSeries *series;
+</code></pre>
+
+<ul>
+<li>在构造函数中对series进行实例化，并跟之前创建的坐标轴关联起来：</li>
+</ul>
+<pre><code>    series = new QSplineSeries(this);
+    series-&gt;attachAxis(axisX);
+    series-&gt;attachAxis(axisY);
+</code></pre>
+
+<p>然后添加定时器：</p>
+<pre><code>
+Dialog::Dialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::Dialog)
+{
+    .....
+    QTimer timer;
+    connect(&amp;timer, &amp;QTimer::timeout, this, &amp;Chart::Timeout_handler);
+    timer.setInterval(1000);
+}
+
+void Dialog::Timeout_handler()
+{
+
+}
+</code></pre>
+
+<p>首先定义一个整形变量x_index，初始化为0，用来给series序列中的x赋值，定时器每触发一个事件，使用随机数生成函数生成的值给series序列中的y赋值,然后x_index的值加一,主要代码如下：</p>
+<pre><code>void Dialog::Timeout_handler()
+{
+    QDateTime dt;
+    QString current_dt = dt.currentDateTime().toString(&quot;yyyy:MM:dd:hh:mm:ss:zzz&quot;);
+    qsrand(dt.currentDateTime().toTime_t());
+    int y = qrand() % 10;
+    series-&gt;append(x_index,y);
+    x_index ++;
+    qDebug()&lt;&lt;&quot;x_index:&quot;&lt;&lt;x_index;
+}
+</code></pre>
+
+<p>运行结果如下：</p>
+<p><img alt="" src="d_plot.gif" /></p>
+<p>从上图中可以看到曲线是动起来了，可是当x_index大于10的时候，曲线就没有动了，也就是时序列series第10个及后面数据都没有显示出来，</p>
+<h2 id="3">3、实现实时曲线</h2>
+<p>因为之前X轴范围为0-10，能显示的数据也就只有x值在0-10范围内，超过10的就无法显示，那如果要显示实时更新的数据，该怎么操作呢？</p>
+<h4 id="1-seriesx">1. 一个方法是当序列series中的数据增加时，X轴范围也增加，代码如下：</h4>
+<pre><code>void Dialog::Timeout_handler()
+{
+    QDateTime dt;
+    QString current_dt = dt.currentDateTime().toString(&quot;yyyy:MM:dd:hh:mm:ss:zzz&quot;);
+    qsrand(dt.currentDateTime().toTime_t());
+    int y = qrand() % 10;
+    series-&gt;append(x_index,y);
+
+    if(x_index &gt; 10)
+        axisX-&gt;setRange(0, x_index);
+    x_index ++;
+}
+</code></pre>
+
+<p>当x_index超过10后，每增加一个，就把x轴显示范围设置为0-x_inxex,显示效果如下：</p>
+<p><img alt="" src="change_x.gif" /></p>
+<h4 id="2-x">2. 还是改变x轴的，不过，可现实区域是固定的</h4>
+<pre><code>void Dialog::Timeout_handler()
+{
+    QDateTime dt;
+    QString current_dt = dt.currentDateTime().toString(&quot;yyyy:MM:dd:hh:mm:ss:zzz&quot;);
+    qsrand(dt.currentDateTime().toTime_t());
+    int y = qrand() % 10;
+    series-&gt;append(x_index,y);
+
+    if(x_index &gt; 10)
+        axisX-&gt;setRange(x_index-10, x_index);
+    x_index ++;
+}
+</code></pre>
+
+<p><img alt="" src="change_x_with.gif" /></p>
+<h4 id="3-scroll">3. 使用scroll方法</h4>
+<p>代码如下：</p>
+<pre><code>void Dialog::Timeout_handler()
+{
+    QDateTime dt;
+    QString current_dt = dt.currentDateTime().toString(&quot;yyyy:MM:dd:hh:mm:ss:zzz&quot;);
+    qsrand(dt.currentDateTime().toTime_t());
+    int y = qrand() % 10;
+    series-&gt;append(x_index,y);
+
+    qreal x = chart-&gt;plotArea().width() / 10;
+    if(x_index &gt; 10)
+        chart-&gt;scroll(x,0);
+    x_index ++;
+}
+</code></pre>
+
+<p><img alt="" src="scroll.gif" /></p>
+<h4 id="4-serial">4. 更新全部serial</h4>
+<p>这种方法是保持序列series的x轴的值不变，都是0-10，改变的是0-10对应的y轴的值，首先定义一个list用来保存获取到的Y轴的值：</p>
+<pre><code>QList&lt;int&gt; y_list;
+</code></pre>
+
+<pre><code>void Dialog::Timeout_handler()
+{
+    QDateTime dt;
+    QString current_dt = dt.currentDateTime().toString(&quot;yyyy:MM:dd:hh:mm:ss:zzz&quot;);
+    qsrand(dt.currentDateTime().toTime_t());
+    int y = qrand() % 10;
+    y_list.append(y);
+    if(y_list.length()&gt;11)
+        y_list.removeFirst();
+    QList&lt;QPointF&gt; points;
+    points.clear();
+    for(int i=0;i&lt;y_list.length();i++)
+    {
+
+        points.append(QPointF(i,y_list.at(i)));
+    }
+    series-&gt;replace(points);
+}
+</code></pre>
+
+<p>效果如下：</p>
+<p><img alt="" src="X_no_change.gif" /></p>
+<p>上图中可以看到，图标中的曲线一直在变化，可是X轴的范围保持在0-10，</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../Axis/" class="btn btn-neutral" title="坐标轴"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href="../Axis/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

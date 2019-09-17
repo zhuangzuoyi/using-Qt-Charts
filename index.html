@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="None">
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>Qt Charts - 使用Qt Charts</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Qt Charts";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> 使用Qt Charts</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href=".">Qt Charts</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#qt-charts">一、Qt Charts</a></li>
+    
+
+    <li class="toctree-l2"><a href="#_1">二、实现一个最简单的折线图</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#1qt-widgets-application">1、创建一个Qt Widgets Application工程，如下图：</a></li>
+        
+            <li><a class="toctree-l3" href="#2ui">2、编辑UI文件</a></li>
+        
+            <li><a class="toctree-l3" href="#3chart">3、添加chart库</a></li>
+        
+            <li><a class="toctree-l3" href="#4qchartview">4、添加QChartView</a></li>
+        
+            <li><a class="toctree-l3" href="#5">5、实现图表</a></li>
+        
+            <li><a class="toctree-l3" href="#6">6、添加折线图序列</a></li>
+        
+        </ul>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="03/">不适用UI的情况下使用QTCharts</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="Axis/">坐标轴</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="02/">实时曲线</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">使用Qt Charts</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Qt Charts</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="qt-charts">一、Qt Charts</h1>
+<p>Qt Charts是基于Qt Graphics View实现的一个图表的组件，可以用来在QT GUI程序中添加现在风格的、可交互的、以数据为中心的图表，可以用作QWidget或者 QGraphicsWidget，也可用在QML中。支持的图标类型有：折线图跟曲线图、面积图、饼图、柱状图等。</p>
+<p>QT提供的相关的class有：</p>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/Cpp_class.png?x-oss-process=style/add_shuiying" />                 </p>
+<p>算了下，一共有48个类，实现一个图表并不需要全部用到，根据所需实现的图表，只需用到当中的几个就行，这些类，大致上可以分为如下几类：</p>
+<ul>
+<li>
+<p><a href="https://doc.qt.io/qt-5/qchartview.html">QChartView Class</a>：
+一个用来显示图表的区域，或者理解为画布，可以在QChartView上实现所有Qt Chart支持的图表。</p>
+<p><code>QChartView &lt;-- QGraphicsView &lt;-- QAbstractScrollArea &lt;-- QFrame &lt;-- QWidget</code></p>
+</li>
+<li>
+<p><a href="https://doc.qt.io/qt-5/qchart.html">QChart</a>：QChart是QGraphicsWidget，可以在QGraphicsScene上显示，用来管理图表中的数据、图例、坐标轴等，</p>
+</li>
+</ul>
+<p><code>QChart &lt;-- QGraphicsWidget &lt;-- QGraphicsObject and QGraphicsLayoutItem  QGraphicsObject  &lt;--  QObject and QGraphicsItem</code></p>
+<ul>
+<li>图表类型<ul>
+<li><a href="https://doc.qt.io/qt-5/qlineseries.html">QLineSeries</a></li>
+<li><a href="https://doc.qt.io/qt-5/qsplineseries.html">QSplineSeries</a></li>
+<li><a href="">QAreaSeries</a></li>
+<li><a href="">QScatterSeries</a></li>
+<li><a href="https://doc.qt.io/qt-5/qml-qtcharts-abstractbarseries.html">QAbstractBarSeries</a><ul>
+<li>BarSeries</li>
+<li>StackedBarSeries </li>
+<li>PercentBarSeries</li>
+<li>HorizontalBarSeries</li>
+<li>HorizontalStackedBarSeries </li>
+<li>HorizontalPercentBarSeries</li>
+</ul>
+</li>
+<li><a href="">QPieSeries </a></li>
+<li><a href="">QBoxPlotSeries </a></li>
+<li><a href="">QCandlestickSeries</a>
+  所有图表类型都是从QAbstractSeries 派生出来的，QAbstractSeries 是一个抽象序列，</li>
+</ul>
+</li>
+<li><a href="">QAbstractAxis </a>:坐标轴</li>
+<li>图例：基类为<a href="https://doc.qt.io/qt-5/qlegendmarker.html">QLegendMarker</a>,在此基础上派生出不同的图例，如QAreaLegendMarker, QBarLegendMarker, QBoxPlotLegendMarker等</li>
+</ul>
+<h1 id="_1">二、实现一个最简单的折线图</h1>
+<h3 id="1qt-widgets-application">1、创建一个Qt Widgets Application工程，如下图：</h3>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/create_project.png?x-oss-process=style/add_shuiying" /></p>
+<p>给工程命名为<strong>qchart</strong>,</p>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/name_project.png?x-oss-process=style/add_shuiying" /></p>
+<p>做一个比较简单的，选择基类为QDialog:</p>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/dialog_project.png?x-oss-process=style/add_shuiying" /></p>
+<p>建成后的项目如下：</p>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/project_overview.png?x-oss-process=style/add_shuiying" /></p>
+<h3 id="2ui">2、编辑UI文件</h3>
+<p>打开<strong>dialog.ui</strong>,添加<strong>Vertical Layout</strong>,然后选择水平布局，如下图：</p>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/edit_ui_file.png?x-oss-process=style/add_shuiying" /></p>
+<h3 id="3chart">3、添加chart库</h3>
+<ul>
+<li>编辑pro文件：在<strong>pro</strong>文件中添加：<strong>QT += charts</strong>，如下：</li>
+</ul>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/edit_pro_file.png?x-oss-process=style/add_shuiying" /></p>
+<ul>
+<li>在 <strong>.h</strong>声明命名空间(这里在dialog.h中添加)</li>
+</ul>
+<pre><code>using namespace QtCharts;
+</code></pre>
+
+<p>或者</p>
+<pre><code>QT_CHARTS_USE_NAMESPACE
+</code></pre>
+
+<p>编译运行，如果没有错误，运行结果如下：</p>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/init.png?x-oss-process=style/add_shuiying" /></p>
+<h3 id="4qchartview">4、添加QChartView</h3>
+<p>由于Qt Charts是基于Qt Graphics View实现的，要在UI应用中添加图表功能，首先需要个QGraphicsView，Qt Charts提供了QChartView，首先我们再这里添加QChartView:
+* 在头文件diloag.h中包含如下头文件</p>
+<pre><code>#include &lt;QChartView&gt;
+</code></pre>
+
+<ul>
+<li>然后再类定义中添加变量：</li>
+</ul>
+<pre><code>class Dialog : public QDialog
+{
+    Q_OBJECT
+
+public:
+    explicit Dialog(QWidget *parent = nullptr);
+    ~Dialog();
+
+private:
+    Ui::Dialog *ui;
+
+    QChartView *ChartView;
+};
+</code></pre>
+
+<p>其中</p>
+<pre><code>    QChartView *ChartView;
+</code></pre>
+
+<p>是新添加的，</p>
+<ul>
+<li>在Dialog构造函数中添加代码：</li>
+</ul>
+<pre><code>Dialog::Dialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::Dialog)
+{
+    ui-&gt;setupUi(this);
+
+
+    ChartView = new QChartView(this);
+    ui-&gt;verticalLayout-&gt;addWidget(ChartView);
+}
+</code></pre>
+
+<p>运行结果如下：</p>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/add_chartView.png?x-oss-process=style/add_shuiying" /></p>
+<p>上图中，与之前的执行结果相比，多了个白色区域，说明QChartView添加成功，因为我们还没有添加任何图标所以是空白的，</p>
+<h3 id="5">5、实现图表</h3>
+<p>QChartView成功添加了后，还要添加管理图表中的序列、坐标轴、图例的QChart，首先添加相关头文件：</p>
+<pre><code> #include &lt;QChart&gt;
+</code></pre>
+
+<p>然后在类定义中添加一个QChart，</p>
+<blockquote>
+<pre><code>QChart *chart;
+</code></pre>
+</blockquote>
+<p>最后，实例化 QChart,并添加到QChartView，代码如下：</p>
+<pre><code>Dialog::Dialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::Dialog)
+{
+    ui-&gt;setupUi(this);
+
+    chart = new QChart();
+    ChartView = new QChartView(this);
+    ChartView-&gt;setChart(chart);
+    ui-&gt;verticalLayout-&gt;addWidget(ChartView);
+}
+</code></pre>
+
+<p>编译运行后如下：</p>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/with_qchart.png?x-oss-process=style/add_shuiying" /></p>
+<p>结果跟上一个步骤一样，因为还没有添加任何图表类型，所以还是空白的，</p>
+<h3 id="6">6、添加折线图序列</h3>
+<p>添加了QChart后，就可以创建一些图标序列，添加到QChart，由于我们要实现的是折线图，这里使用QLineSeries，首先添加相关头文件：</p>
+<pre><code>#include &quot;QLineSeries&quot;
+</code></pre>
+
+<p>声明并实例化QLineSeries：</p>
+<pre><code> QLineSeries* series = new QLineSeries();
+</code></pre>
+
+<p>然后给series添加几个点，并把series添加到chart中：</p>
+<pre><code>Dialog::Dialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::Dialog)
+{
+    ui-&gt;setupUi(this);
+
+    ui-&gt;setupUi(this);
+
+    chart = new QChart();
+
+    QLineSeries* series = new QLineSeries();
+    series-&gt;append(0, 6);
+    series-&gt;append(2, 4);
+    series-&gt;append(4,8);
+    series-&gt;append(8,10);
+    series-&gt;append(10,12);
+
+    chart-&gt;addSeries(series);
+    chart-&gt;createDefaultAxes();
+
+    ChartView = new QChartView(this);
+    ChartView-&gt;setChart(chart);
+    ui-&gt;verticalLayout-&gt;addWidget(ChartView);
+}
+</code></pre>
+
+<p>运行结果如下：</p>
+<p><img alt="" src="http://halin.oss-cn-shanghai.aliyuncs.com/QT/Qt_Charts/01/linechart.png?x-oss-process=style/add_shuiying" /></p>
+<p>到这里就实现了一个最简单的折线图了，
+如果要实现其他的图表，如曲线图，只需要把第6部分的QLineSeries替换成QSplineSeries即可，当然不懂的图表，也许会有些不一样</p>
+<p>参考：    <br />
+<a href="https://doc.qt.io/qt-5/qtcharts-overview.html">Qt Charts Overview</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="03/" class="btn btn-neutral float-right" title="不适用UI的情况下使用QTCharts">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+        <span style="margin-left: 15px"><a href="03/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.0.4
+Build Date UTC : 2019-09-17 15:21:30
+-->
